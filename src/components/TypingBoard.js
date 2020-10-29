@@ -13,7 +13,8 @@ class TypingBoard extends React.Component {
       mistypedIndexes: [],
       currentIndex: 0,
       countdownValue: this.duration,
-      wordsPerMin: null
+      wordsPerMin: null,
+      accurancy: null
     }
   }
 
@@ -29,7 +30,8 @@ class TypingBoard extends React.Component {
 
       if (typedWords > 0) {
         let wordsPerMin = parseInt((typedWords / passedTime) * (this.duration / minutes));
-        this.setState({ wordsPerMin });
+        let accurancy = parseInt(100 - ((this.state.mistypedIndexes.length / this.state.typedText.length) * 100));
+        this.setState({ wordsPerMin, accurancy });
       }
     }, 1000);
   }
@@ -104,15 +106,18 @@ class TypingBoard extends React.Component {
   render() {
     return(
       <div className="flex flex-wrap justify-center">
-        <div className="flex justify-center mt-4 p-4 text-6xl font-bold text-gray-900 items-end">
+        <div className="w-full flex justify-between py-8 text-4xl font-bold text-gray-900">
           <div className="px-12">
-          {this.state.countdownValue}<span className="inline-block text-4xl">{this.state.countdownValue ? "s" : ""}</span>
+            {this.state.accurancy}<span className="inline-block text-2xl">{this.state.accurancy ? "%" : ""}</span>
           </div>
           <div className="px-12">
-            {this.state.wordsPerMin}<span className="inline-block text-4xl">{this.state.wordsPerMin ? "wpm" : ""}</span>
+            {this.state.wordsPerMin}<span className="inline-block text-2xl">{this.state.wordsPerMin ? "wpm" : ""}</span>
+          </div>
+          <div className="px-12">
+            {this.state.countdownValue}<span className="inline-block text-2xl">{this.state.countdownValue ? "s" : ""}</span>
           </div>
         </div>
-        <div className="bg-blue-100 w-11/12 flex flex-wrap justify-center text-4xl text-gray-700 px-4 py-4 tracking-wider">
+        <div className="bg-blue-200 border-t-4 border-gray-900 w-11/12 flex flex-wrap text-2xl font-bold text-gray-700 px-4 py-12 tracking-wider">
           <form>
             <input
               val={this.state.typedText}
