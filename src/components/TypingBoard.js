@@ -3,28 +3,32 @@ import Character from './Character';
 import Word from './Word';
 
 class TypingBoard extends React.Component {
-  state = {
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently   with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    typedText: "",
-    mistypedIndexes: [],
-    currentIndex: 0,
-    countdownValue: null,
-    wordsPerMin: null
-  }
+  constructor(props) {
+    super(props);
 
-  counter = 60;
+    this.duration = props.location.duration || 60;
+    this.state = {
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently   with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+      typedText: "",
+      mistypedIndexes: [],
+      currentIndex: 0,
+      countdownValue: this.duration,
+      wordsPerMin: null
+    }
+  }
 
   componentDidMount() {
     this.interval = setInterval(() => {
-      this.setState({ countdownValue: this.counter-- });
+      this.setState({ countdownValue: this.state.countdownValue - 1 });
+      let minutes = parseInt(this.duration / 60);
 
-      let passedTime = 60 - this.counter;
+      let passedTime = this.duration - this.state.countdownValue;
       let typedWords = this.state.text
         .substring(0, this.state.currentIndex + 1)
         .split(" ").length - 1;
 
       if (typedWords > 0) {
-        let wordsPerMin = parseInt((typedWords / passedTime) * 60);
+        let wordsPerMin = parseInt((typedWords / passedTime) * (this.duration / minutes));
         this.setState({ wordsPerMin });
       }
     }, 1000);
@@ -33,6 +37,10 @@ class TypingBoard extends React.Component {
   componentDidUpdate() {
     if(this.state.countdownValue == 0) {
       clearInterval(this.interval);
+      this.props.history.push({
+        pathname: "/result",
+        result: this.state.wordsPerMin
+      });
     }
   }
 
@@ -43,17 +51,18 @@ class TypingBoard extends React.Component {
     return [...newText].map((word, i) => {
       let chars = [...word].map( char => {
         let classes = "";
+        let typingStart = this.state.currentIndex === 0;
 
         if (this.state.mistypedIndexes.includes(letterIndex)) {
-          classes += "bg-red-500";
+          classes += "bg-red-400";
         }
 
-        if (this.state.currentIndex === letterIndex) {
+        if ((this.state.currentIndex + 1 === letterIndex && !typingStart) || (letterIndex === 0 && typingStart)) {
           classes += " underline text-gray-900";
         }
 
-        if (this.state.currentIndex >= letterIndex) {
-          classes += " font-bold text-gray-900"
+        if (this.state.currentIndex >= letterIndex && !this.state.mistypedIndexes.includes(letterIndex)) {
+          classes += " bg-blue-400"
         }
 
         letterIndex += 1;
