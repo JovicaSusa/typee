@@ -4,14 +4,40 @@ import Word from './Word';
 
 class App extends React.Component {
   state = {
-    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently    with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+    text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently   with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
     typedText: "",
     mistypedIndexes: [],
     currentIndex: 0,
+    countdownValue: null,
+    wordsPerMin: null
+  }
+
+  counter = 60;
+
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      this.setState({ countdownValue: this.counter-- });
+
+      let passedTime = 60 - this.counter;
+      let typedWords = this.state.text
+        .substring(0, this.state.currentIndex + 1)
+        .split(" ").length - 1;
+
+      if (typedWords > 0) {
+        let wordsPerMin = parseInt((typedWords / passedTime) * 60);
+        this.setState({ wordsPerMin });
+      }
+    }, 1000);
+  }
+
+  componentDidUpdate() {
+    if(this.state.countdownValue == 0) {
+      clearInterval(this.interval);
+    }
   }
 
   createCharacters = () => {
-    let newText = this.state.text.replace(/ /g, '\u00a0').match(/\w+\s+/g);
+    let newText = this.state.text.replace(/ /g, '\u00a0').match(/\w+|\s+|,|./g);
     let letterIndex = 0;
 
     return [...newText].map((word, i) => {
@@ -23,11 +49,11 @@ class App extends React.Component {
         }
 
         if (this.state.currentIndex === letterIndex) {
-          classes += " underline";
+          classes += " underline text-gray-900";
         }
 
         if (this.state.currentIndex >= letterIndex) {
-          classes += " font-bold"
+          classes += " font-bold text-gray-900"
         }
 
         letterIndex += 1;
@@ -68,16 +94,26 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="w-full flex flex-wrap justify-center text-4xl text-gray-800 py-12 px-24 tracking-wider whitespace-pre-wrap">
-        <form>
-          <input
-            val={this.state.typedText}
-            autoFocus
-            onKeyUp={this.handleOnChange}
-            style={{position: 'absolute', top: '-100px'}}
-          />
-        </form>
-        {this.createCharacters()}
+      <div className="flex flex-wrap justify-center">
+        <div className="flex justify-center mt-4 p-4 text-6xl font-bold text-gray-900 items-end">
+          <div className="px-12">
+          {this.state.countdownValue}<span className="inline-block text-4xl">{this.state.countdownValue ? "s" : ""}</span>
+          </div>
+          <div className="px-12">
+            {this.state.wordsPerMin}<span className="inline-block text-4xl">{this.state.wordsPerMin ? "wpm" : ""}</span>
+          </div>
+        </div>
+        <div className="bg-blue-100 w-11/12 flex flex-wrap justify-center text-4xl text-gray-700 px-4 py-4 tracking-wider">
+          <form>
+            <input
+              val={this.state.typedText}
+              autoFocus
+              onKeyUp={this.handleOnChange}
+              style={{position: 'absolute', top: '-100px'}}
+            />
+          </form>
+          {this.createCharacters()}
+        </div>
       </div>
     )
   }
