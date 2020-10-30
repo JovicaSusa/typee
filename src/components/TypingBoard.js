@@ -24,7 +24,7 @@ class TypingBoard extends React.Component {
   }
 
   componentDidUpdate() {
-    if(this.state.countdownValue == 0) {
+    if(this.state.countdownValue === 0) {
       clearInterval(this.interval);
 
       this.props.history.push({
@@ -110,7 +110,7 @@ class TypingBoard extends React.Component {
 
         return <Character
           char={char}
-          style={classes}
+          classStyle={classes}
           key={letterIndex}
         />
       });

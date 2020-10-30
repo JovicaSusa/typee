@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Character = ({char, style}) => {
+const Character = ({char, classStyle}) => {
   return(
-    <span className={`${style} py-1`}>
+    <span className={`${classStyle} py-1`}>
       {char}
     </span>
   )
