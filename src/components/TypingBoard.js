@@ -7,6 +7,7 @@ class TypingBoard extends React.Component {
     super(props);
 
     this.duration = props.location.duration || 60;
+    this._started = false;
     this.state = {
       text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently   with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
       typedText: "",
@@ -19,8 +20,54 @@ class TypingBoard extends React.Component {
   }
 
   componentDidMount() {
+    this._mounted = true;
+  }
+
+  componentDidUpdate() {
+    if(this.state.countdownValue == 0) {
+      clearInterval(this.interval);
+
+      this.props.history.push({
+        pathname: "/result",
+        result: {
+          accurancy: this.state.accurancy,
+          wordsPerMin: this.state.wordsPerMin
+        }
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    this._mounted = false;
+  }
+
+  handleOnChange = event => {
+    if (!this._started) {
+      this.monitorTyping();
+      this._started = true;
+    }
+
+    if([16,20].includes(event.keyCode)) { return; }
+
+    let typedText = event.target.value;
+    let currentIndex = typedText.length - 1;
+    let backSpaceTyped = (event.keyCode || event.charCode) === 8;
+
+    this.setState({typedText, currentIndex})
+
+    if (backSpaceTyped) {
+      this.handleTypingBackward(typedText, currentIndex);
+    } else {
+      this.handleTypingForward(typedText, currentIndex);
+    }
+  }
+
+  monitorTyping = () => {
     this.interval = setInterval(() => {
-      this.setState({ countdownValue: this.state.countdownValue - 1 });
+      if(this._mounted) {
+        this.setState({ countdownValue: this.state.countdownValue - 1 });
+      }
+
       let minutes = parseInt(this.duration / 60);
 
       let passedTime = this.duration - this.state.countdownValue;
@@ -31,19 +78,11 @@ class TypingBoard extends React.Component {
       if (typedWords > 0) {
         let wordsPerMin = parseInt((typedWords / passedTime) * (this.duration / minutes));
         let accurancy = parseInt(100 - ((this.state.mistypedIndexes.length / this.state.typedText.length) * 100));
-        this.setState({ wordsPerMin, accurancy });
+        if(this._mounted) {
+          this.setState({ wordsPerMin, accurancy });
+        }
       }
     }, 1000);
-  }
-
-  componentDidUpdate() {
-    if(this.state.countdownValue == 0) {
-      clearInterval(this.interval);
-      this.props.history.push({
-        pathname: "/result",
-        result: this.state.wordsPerMin
-      });
-    }
   }
 
   createCharacters = () => {
@@ -82,24 +121,20 @@ class TypingBoard extends React.Component {
     })
   }
 
-  handleOnChange = event => {
-    if([16,20].includes(event.keyCode)) { return; }
 
-    let typedText = event.target.value;
-    let currentIndex = typedText.length - 1;
+  handleTypingForward = (typedText, currentIndex) => {
+    if (typedText[currentIndex] !== this.state.text[currentIndex]) {
+      this.setState({ mistypedIndexes: [...this.state.mistypedIndexes, currentIndex] });
+    }
+  }
 
-    let isNotBackSpace = (event.keyCode || event.charCode) != 8;
+  handleTypingBackward = (typedText, currentIndex) => {
+    let currentIndexBeforeBackSpace = currentIndex + 1;
+    if (this.state.mistypedIndexes.includes(currentIndexBeforeBackSpace)) {
+      let mistypedIndexes = this.state.mistypedIndexes
+        .filter( el => el !== currentIndexBeforeBackSpace);
 
-    this.setState({typedText, currentIndex})
-
-    if (event.target.value[currentIndex] !== this.state.text[currentIndex] && isNotBackSpace) {
-      this.setState({ mistypedIndexes: [...this.state.mistypedIndexes, currentIndex] })
-    } else if (this.state.mistypedIndexes.includes(currentIndex) || this.state.mistypedIndexes.includes(currentIndex + 1)) {
-      this.setState({
-        mistypedIndexes: this.state.mistypedIndexes.filter(el => {
-          return el != currentIndex && el != currentIndex + 1;
-        })
-      });
+      this.setState({ mistypedIndexes })
     }
   }
 
