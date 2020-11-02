@@ -24,7 +24,7 @@ const Character = () => {
 
   return(
     <div className="flex justify-center items-center h-screen">
-      <div className="w-2/6 flex flex-wrap justify-center">
+      <div className="w-2/6 flex flex-wrap justify-center -mt-40">
         <div className="w-9/12 flex justify-center items-center border-4 border-gray-900 py-4 px-8 w-64 text-2xl font-bold">
           <span className="inline-block">Select duration</span>
         </div>
@@ -73,5 +73,3 @@ const Character = () => {
 };
 
 export default Character;
-
-// <Link to="/type">Start typing</Link>

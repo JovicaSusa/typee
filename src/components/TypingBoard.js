@@ -53,33 +53,31 @@ class TypingBoard extends React.Component {
     let currentIndex = typedText.length - 1;
     let backSpaceTyped = (event.keyCode || event.charCode) === 8;
 
-    this.setState({typedText, currentIndex})
+    let mistypedIndexes = backSpaceTyped ? this.handleTypingBackward(typedText, currentIndex) : this.handleTypingForward(typedText, currentIndex);
 
-    if (backSpaceTyped) {
-      this.handleTypingBackward(typedText, currentIndex);
+    if(mistypedIndexes) {
+      this.setState({ typedText, currentIndex, mistypedIndexes })
     } else {
-      this.handleTypingForward(typedText, currentIndex);
+      this.setState({ typedText, currentIndex })
     }
   }
 
   monitorTyping = () => {
     this.interval = setInterval(() => {
-      if(this._mounted) {
-        this.setState({ countdownValue: this.state.countdownValue - 1 });
-      }
-
-      let minutes = parseInt(this.duration / 60);
-
-      let passedTime = this.duration - this.state.countdownValue;
+      let minutes = parseInt(this.duration / 60); // move this to constructor
+      let newCountdownValue = this.state.countdownValue - 1;
+      let passedTime = this.duration - newCountdownValue;
       let typedWords = this.state.text
         .substring(0, this.state.currentIndex + 1)
         .split(" ").length - 1;
 
       if (typedWords > 0) {
         let wordsPerMin = parseInt((typedWords / passedTime) * (this.duration / minutes));
-        let accurancy = parseInt(100 - ((this.state.mistypedIndexes.length / this.state.typedText.length) * 100));
+        let accurancy = (100 - ((this.state.mistypedIndexes.length / this.state.typedText.length) * 100));
+        accurancy = Math.round(accurancy*100) / 100;
+
         if(this._mounted) {
-          this.setState({ wordsPerMin, accurancy });
+          this.setState({ wordsPerMin, accurancy, countdownValue: newCountdownValue });
         }
       }
     }, 1000);
@@ -87,31 +85,18 @@ class TypingBoard extends React.Component {
 
   createCharacters = () => {
     let newText = this.state.text.replace(/ /g, '\u00a0').match(/\w+|\s+|,|./g);
-    let letterIndex = 0;
+    let characterIndex = 0;
 
     return [...newText].map((word, i) => {
       let chars = [...word].map( char => {
-        let classes = "";
-        let typingStart = this.state.currentIndex === 0;
+        let characterStyle = this.setupCharacterStyle(characterIndex)
 
-        if (this.state.mistypedIndexes.includes(letterIndex)) {
-          classes += "bg-red-400";
-        }
-
-        if ((this.state.currentIndex + 1 === letterIndex && !typingStart) || (letterIndex === 0 && typingStart)) {
-          classes += " underline text-gray-900";
-        }
-
-        if (this.state.currentIndex >= letterIndex && !this.state.mistypedIndexes.includes(letterIndex)) {
-          classes += " bg-blue-400"
-        }
-
-        letterIndex += 1;
+        characterIndex += 1;
 
         return <Character
           char={char}
-          classStyle={classes}
-          key={letterIndex}
+          classStyle={characterStyle}
+          key={characterIndex}
         />
       });
 
@@ -121,21 +106,42 @@ class TypingBoard extends React.Component {
     })
   }
 
-
   handleTypingForward = (typedText, currentIndex) => {
     if (typedText[currentIndex] !== this.state.text[currentIndex]) {
-      this.setState({ mistypedIndexes: [...this.state.mistypedIndexes, currentIndex] });
+      return [...this.state.mistypedIndexes, currentIndex]
     }
   }
 
   handleTypingBackward = (typedText, currentIndex) => {
     let currentIndexBeforeBackSpace = currentIndex + 1;
+
     if (this.state.mistypedIndexes.includes(currentIndexBeforeBackSpace)) {
       let mistypedIndexes = this.state.mistypedIndexes
         .filter( el => el !== currentIndexBeforeBackSpace);
 
-      this.setState({ mistypedIndexes })
+      return mistypedIndexes;
     }
+  }
+
+  setupCharacterStyle = (characterIndex) => {
+    if (characterIndex > this.state.currentIndex + 1) { return; }
+
+    let style = "";
+    let typingStart = this.state.currentIndex === 0;
+
+    if (this.state.mistypedIndexes.includes(characterIndex)) {
+      style += "bg-red-400";
+    }
+
+    if ((this.state.currentIndex + 1 === characterIndex && !typingStart) || (characterIndex === 0 && typingStart)) {
+      style += " underline current-char";
+    }
+
+    if (this.state.currentIndex >= characterIndex && !this.state.mistypedIndexes.includes(characterIndex)) {
+      style += " bg-blue-400"
+    }
+
+    return style;
   }
 
   render() {
