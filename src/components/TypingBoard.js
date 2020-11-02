@@ -28,7 +28,7 @@ class TypingBoard extends React.Component {
       clearInterval(this.interval);
 
       this.props.history.push({
-        pathname: "/result",
+        pathname: "/typing-result",
         result: {
           accurancy: this.state.accurancy,
           wordsPerMin: this.state.wordsPerMin

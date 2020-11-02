@@ -35,36 +35,46 @@ const Character = () => {
         </div>
         <div className="w-full relative">
           <div className={`absolute ${selectBoxVisibility} top-0 border-b-4 border-l-4 border-r-4 border-gray-900 w-full`}>
-            <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
-              <Link to={{
-                pathname: 'type',
-                duration: 60
-              }}>1:00</Link>
-            </span>
-            <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
-              <Link to={{
-                pathname: 'type',
-                duration: 120
-              }}>2:00</Link>
-            </span>
-            <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
-              <Link to={{
-                pathname: 'type',
-                duration: 180
-              }}>3:00</Link>
-            </span>
-            <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
-              <Link to={{
-                pathname: 'type',
-                duration: 240
-              }}>4:00</Link>
-            </span>
-            <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
-              <Link to={{
-                pathname: 'type',
-                duration: 300
-              }}>5:00</Link>
-            </span>
+            <Link to={{
+              pathname: 'typing-test',
+              duration: 60
+            }}>
+              <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
+                1:00
+              </span>
+            </Link>
+            <Link to={{
+              pathname: 'typing-test',
+              duration: 120
+            }}>
+              <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
+                2:00
+              </span>
+            </Link>
+            <Link to={{
+              pathname: 'typing-test',
+              duration: 180
+            }}>
+              <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
+                3:00
+              </span>
+            </Link>
+            <Link to={{
+              pathname: 'typing-test',
+              duration: 240
+            }}>
+              <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
+                4:00
+              </span>
+            </Link>
+            <Link to={{
+              pathname: 'typing-test',
+              duration: 300
+            }}>
+              <span className="block cursor-pointer text-center py-2 text-2xl font-bold hover:bg-gray-900 hover:text-blue-200">
+                5:00
+              </span>
+            </Link>
           </div>
         </div>
       </div>
