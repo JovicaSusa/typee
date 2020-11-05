@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import Character from './Character';
 import Word from './Word';
 
@@ -8,6 +8,7 @@ class TypingBoard extends React.Component {
 
     this.duration = props.location.duration || 60;
     this._started = false;
+    this.inputRef = createRef();
     this.state = {
       text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently   with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
       typedText: "",
@@ -123,6 +124,10 @@ class TypingBoard extends React.Component {
     }
   }
 
+  handleClick = (event) => {
+    this.inputRef.current.focus();
+  }
+
   setupCharacterStyle = (characterIndex) => {
     if (characterIndex > this.state.currentIndex + 1) { return; }
 
@@ -146,7 +151,7 @@ class TypingBoard extends React.Component {
 
   render() {
     return(
-      <div className="flex flex-wrap justify-center">
+      <div className="flex flex-wrap justify-center" onClick={this.handleClick}>
         <div className="w-full flex justify-between py-8 text-4xl font-bold text-gray-900">
           <div className="px-12">
             {this.state.accurancy}<span className="inline-block text-2xl">{this.state.accurancy ? "%" : ""}</span>
@@ -165,6 +170,7 @@ class TypingBoard extends React.Component {
               autoFocus
               onKeyUp={this.handleOnChange}
               style={{position: 'absolute', top: '-100px'}}
+              ref={this.inputRef}
             />
           </form>
           {this.createCharacters()}
