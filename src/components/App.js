@@ -21,8 +21,8 @@ class App extends React.Component {
 
           <Switch>
             <Route path='/' component={Home} exact />
-            <Route path="/type" component={TypingBoard} />
-            <Route path="/result" component={Result} />
+            <Route path="/typing-test" component={TypingBoard} />
+            <Route path="/typing-result" component={Result} />
           </Switch>
         </BrowserRouter>
       </div>

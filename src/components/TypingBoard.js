@@ -10,7 +10,7 @@ class TypingBoard extends React.Component {
     this._started = false;
     this.inputRef = createRef();
     this.state = {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently   with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently   with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently   with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. ",
       typedText: "",
       mistypedIndexes: [],
       currentIndex: 0,
@@ -29,7 +29,7 @@ class TypingBoard extends React.Component {
       clearInterval(this.interval);
 
       this.props.history.push({
-        pathname: "/result",
+        pathname: "/typing-result",
         result: {
           accurancy: this.state.accurancy,
           wordsPerMin: this.state.wordsPerMin
@@ -65,6 +65,15 @@ class TypingBoard extends React.Component {
 
   monitorTyping = () => {
     this.interval = setInterval(() => {
+      let currentChar = document.querySelector(".current-char");
+      let typedTextDiv = document.querySelector(".typed-text");
+
+      if (currentChar) {
+        let topOffset = currentChar.offsetTop;
+
+        typedTextDiv.style.top = `-${topOffset}px`;
+      }
+
       let minutes = parseInt(this.duration / 60); // move this to constructor
       let newCountdownValue = this.state.countdownValue - 1;
       let passedTime = this.duration - newCountdownValue;
@@ -153,13 +162,13 @@ class TypingBoard extends React.Component {
     return(
       <div className="flex flex-wrap justify-center" onClick={this.handleClick}>
         <div className="w-full flex justify-between py-8 text-4xl font-bold text-gray-900">
-          <div className="px-12">
+          <div className="px-12 w-1/3 flex justify-start">
             {this.state.accurancy}<span className="inline-block text-2xl">{this.state.accurancy ? "%" : ""}</span>
           </div>
-          <div className="px-12">
+          <div className="px-12 w-1/3 flex justify-center">
             {this.state.wordsPerMin}<span className="inline-block text-2xl">{this.state.wordsPerMin ? "wpm" : ""}</span>
           </div>
-          <div className="px-12">
+          <div className="px-12 w-1/3 flex justify-end">
             {this.state.countdownValue}<span className="inline-block text-2xl">{this.state.countdownValue ? "s" : ""}</span>
           </div>
         </div>
@@ -173,7 +182,11 @@ class TypingBoard extends React.Component {
               ref={this.inputRef}
             />
           </form>
-          {this.createCharacters()}
+          <div className="h-64 overflow-hidden relative w-full">
+            <div className="absolute typed-text">
+              {this.createCharacters()}
+            </div>
+          </div>
         </div>
       </div>
     );
